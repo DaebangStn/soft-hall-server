@@ -138,7 +138,6 @@ class BluetoothSocket:
         return BluetoothSocket (self._proto, sockfd=bt.dup (self._sockfd))
 
     def makefile (self):
-        # TODO
         raise Exception("Not yet implemented")
 
 

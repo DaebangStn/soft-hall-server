@@ -30,7 +30,6 @@ def discover_devices(duration=8, flush_cache=True, lookup_names=False,
 def lookup_name(address, timeout=10):
     print("TODO: implement")
 
-# TODO: After a little looking around, it seems that we can go into some of the 
 # lightblue internals and enhance the amount of SDP information that is returned 
 # (e.g., CID/PSM, protocol, provider information).
 #

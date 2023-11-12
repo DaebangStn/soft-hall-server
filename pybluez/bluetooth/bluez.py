@@ -116,7 +116,6 @@ def get_l2cap_options (sock):
     Options are: omtu, imtu, flush_to, mode, fcs, max_tx, txwin_size.
 
     """
-    # TODO this should be in the C module, because it depends
     # directly on struct l2cap_options layout.
     s = sock.getsockopt (SOL_L2CAP, L2CAP_OPTIONS, 12)
     options = list( struct.unpack ("HHHBBBH", s))
@@ -130,7 +129,6 @@ def set_l2cap_options (sock, options):
     get_l2cap_options().
 
     """
-    # TODO this should be in the C module, because it depends
     # directly on struct l2cap_options layout.
     s = struct.pack ("HHHBBBH", *options)
     sock.setsockopt (SOL_L2CAP, L2CAP_OPTIONS, s)
@@ -492,7 +490,6 @@ class DeviceDiscoverer:
         self._process_hci_event ()
 
     def _process_hci_event (self):
-        # FIXME may not wrap _bluetooth.error properly
         if self.sock is None: return
         # voodoo magic!!!
         pkt = self.sock.recv (258)
@@ -628,7 +625,7 @@ class DeviceDiscoverer:
         assert len (self.names_to_find) > 0
         address = list(self.names_to_find.keys ())[0]
         device_class, rssi, psrm, pspm, clockoff = self.names_to_find[address]
-        bdaddr = _bt.str2ba (address) #TODO not supported in python3
+        bdaddr = _bt.str2ba (address)
 
         cmd_pkt = "{}{}\0{}".format(bdaddr, psrm, clockoff)
 

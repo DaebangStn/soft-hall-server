@@ -372,7 +372,6 @@ def sdp_make_data_element (type, value):
         return ts + struct.pack ("!QQ", upper, lower)
     elif type == "SInt128":
         ts = maketsd (2, 4)
-        # FIXME
         raise NotImplementedError ("128-bit signed int NYI!")
     elif type == "UUID":
         if len (value) == 4:

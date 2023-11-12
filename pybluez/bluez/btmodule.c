@@ -2941,7 +2941,6 @@ bt_sdp_stop_advertising( PyObject *self, PyObject *args )
 
     // verify that we got a real socket object
     if( ! socko || (Py_TYPE(socko) != &sock_type) ) {
-        // TODO change this to a more accurate exception type
         PyErr_SetString(bluetooth_error,
                 "must pass in _bluetooth.socket object");
         return 0;
