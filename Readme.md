@@ -6,16 +6,28 @@ cd pybluez
 python setup.py install
 ```
 
-2. Configure hci controller discoverable and pair-able
+2. bluetooth system service to be compatible
 ```
-bluetoothctl
-list # to get the hci controller MAC address
-select <MAC>
-discoverable on
-pairable on
+# edit /etc/systemd/system/dbus-org.bluez.service
+ExecStart=/usr/lib/bluetooth/bluetoothd --compat
+
+sudo systemctl daemon-reload
+sudo systemctl restart bluetooth
 ```
 
-3. Add SPP service
+3. Pairing
+```
+bluetoothctl
+discoverable on
+pairable on
+
+# pairing with sensor
+scan on
+pair <sensor mac address>
+trust <sensor mac address>
+```
+
+4. Add SPP service
 ```
 sudo sdptool add sp
 ```

@@ -24,6 +24,7 @@ class SensorManager:
             self._server.bind((self._server_mac, 1))
             self._server.listen(self._max_connections)
             self._log("Bluetooth server is listening on RFCOMM channel 1")
+            self.__spawner(self._log, self._server, self._data, self._control)
         finally:
             self._server.close()
             self._log("Bluetooth server socket closed")
@@ -37,11 +38,21 @@ class SensorManager:
                     target=self.__client_handler,
                     args=(log, client_socket, client_address, data_q, control_q))
                 client_thread.start()
-                log(f"Started thread for {client_address}")
+                log(f"Started thread for client: {client_address}")
             except Exception as e:
                 log(f"Exception: {e}")
                 break
 
     def __client_handler(self, log, client_socket, client_address, data_q, control_q):
-        pass
+        try:
+            while True:
+                data = client_socket.recv(1024)
+                if not data:
+                    break
+                log(f"Received data from {client_address}: {data}")
+        except Exception as e:
+            log(f"Exception: {e}")
+        finally:
+            client_socket.close()
+            log(f"Closed connection from {client_address}")
 
