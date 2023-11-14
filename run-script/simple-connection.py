@@ -1,4 +1,4 @@
-from controller.sensorManager import SensorManager
+from controller.bt.sensorManager import SensorManager
 
 
 if __name__ == '__main__':
