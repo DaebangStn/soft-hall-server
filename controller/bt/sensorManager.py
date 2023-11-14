@@ -1,5 +1,5 @@
 import socket
-import threading
+from threading import Thread
 
 from model.sensorDataQueue import SensorDataQueue
 from model.sensorControlQueue import SensorControlQueue
@@ -23,9 +23,13 @@ class SensorManager:
             self._log("Initializing bluetooth server socket...")
             self._server.bind((self._server_mac, 1))
             self._server.listen(self._max_connections)
+            spawner_thread = Thread(
+                target=self.__spawner,
+                args=(self._log, self._server, self._data, self._control)
+            )
+            spawner_thread.start()
             self._log("Bluetooth server is listening on RFCOMM channel 1")
-            self.__spawner(self._log, self._server, self._data, self._control)
-        finally:
+        except Exception as e:
             self._server.close()
             self._log("Bluetooth server socket closed")
 
@@ -34,7 +38,7 @@ class SensorManager:
             try:
                 client_socket, client_address = server_socket.accept()
                 log(f"Accepted connection from {client_address}")
-                client_thread = threading.Thread(
+                client_thread = Thread(
                     target=self.__client_handler,
                     args=(log, client_socket, client_address, data_q, control_q))
                 client_thread.start()
