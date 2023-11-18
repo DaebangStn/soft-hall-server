@@ -1,0 +1,9 @@
+sessions:
+  adaptor-mac: "90:0F:0C:35:C6:B2"
+  max-sessions: 5
+
+board:
+  data-rollover: 20000
+  mac-alias:
+    "e8:68:e7:22:aa:ee":
+      name: "foo"

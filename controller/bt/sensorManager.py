@@ -1,3 +1,4 @@
+from queue import SimpleQueue
 import socket
 from threading import Thread
 
@@ -17,8 +18,8 @@ class SensorManager:
     def start(self):
         try:
             self._server = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-            self._data = SensorDataQueue()
-            self._control = SensorControlQueue()
+            self._data = SimpleQueue()
+            self._control = SimpleQueue()
 
             self._log("Initializing bluetooth server socket...")
             self._server.bind((self._server_mac, 1))
@@ -29,6 +30,7 @@ class SensorManager:
             )
             spawner_thread.start()
             self._log("Bluetooth server is listening on RFCOMM channel 1")
+            return self._data, self._control
         except Exception as e:
             self._server.close()
             self._log("Bluetooth server socket closed")
@@ -47,13 +49,16 @@ class SensorManager:
                 log(f"Exception: {e}")
                 break
 
-    def __client_handler(self, log, client_socket, client_address, data_q, control_q):
+    @staticmethod
+    def __client_handler(log, client_socket, client_address, data_q, control_q):
         try:
             while True:
                 data = client_socket.recv(1024)
-                if not data:
-                    break
-                log(f"Received data from {client_address}: {data}")
+                if data:
+                    log(f"Received data from {client_address}")
+                    data = data.rstrip(b'\x00').decode('utf-8')
+                    data_q.put(data)
+                    log(data)
         except Exception as e:
             log(f"Exception: {e}")
         finally:
