@@ -3,7 +3,7 @@ from queue import SimpleQueue
 from model.dataFilter import DataFilter
 from util.config import load_config
 from util.path import get_log_file_path
-from util.time import timestamp, unix_time
+from util.time import timestamp, unix_time_ms, cvt_unix_time_ms_to_datetime
 from bokeh.models import ColumnDataSource
 
 
@@ -49,15 +49,16 @@ class Board:
             if raw_serialized is None:
                 continue
             raw_valid = self._extract_valid(raw_serialized)
-            self._log(f"{self._data_valid_to_str(raw_valid)}")
+            # To inspect data, self._log(f"{self._data_valid_to_str(raw_valid)}")
             self._append_raw_data(total_data, raw_valid)
             self._append_filtered(total_data, raw_valid)
 
+        self._log(f"streaming {len(total_data)} sources")
         for source_name, (values, times) in total_data.items():
-            self._sources[source_name].stream({'value': values, 'time': times}, self._rollover)
+            self._sources[source_name].stream({'value': values, 'datetime': times}, self._rollover)
 
     def _add_sources(self, source_name):
-        self._sources[source_name] = ColumnDataSource(data={'value': [], 'time': []})
+        self._sources[source_name] = ColumnDataSource(data={'value': [], 'datetime': []})
 
     def _append_filtered(self, total_data: Dict[str, Tuple[List[int], List[int]]], data_valid: List[List[str]]):
         for _filter in self._filters:
@@ -125,15 +126,16 @@ class Board:
             stamp = int(data_valid[0][1])
         else:
             indices = range(len(data_valid))
-            stamp = unix_time()
+            stamp = unix_time_ms()
+        dt = cvt_unix_time_ms_to_datetime(stamp)
         for i in indices:
             source_name = data_valid[i][0]
             value = int(data_valid[i][1])
             if source_name not in total_data.keys():
-                total_data[source_name] = ([value], [stamp])
+                total_data[source_name] = ([value], [dt])
             else:
                 total_data[source_name][0].append(value)
-                total_data[source_name][1].append(stamp)
+                total_data[source_name][1].append(dt)
 
     @staticmethod
     def _data_valid_to_str(data: List[List[str]]) -> str:

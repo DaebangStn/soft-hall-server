@@ -2,7 +2,7 @@ import socket
 from threading import Thread
 from model.boardManager import BoardManager
 from util.config import load_config
-from util.time import unix_time_byte
+from util.time import unix_time_us_ascii
 
 
 class Sessions:
@@ -56,8 +56,8 @@ class Sessions:
 
     def _session_handler(self, _socket, address, board):
         self._log(f"[Session] starting with {address}")
-        _socket.send(unix_time_byte())
-        print("unix time sent", unix_time_byte())
+        _socket.send(unix_time_us_ascii())
+        print("unix time sent", unix_time_us_ascii())
         while True:
             try:
                 data = _socket.recv(300)

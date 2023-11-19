@@ -20,14 +20,14 @@ class Root:
             self._add_data_source(source_name, source)
 
     def _add_data_source(self, name: str, data_source: ColumnDataSource):
-        assert name not in self._data_sources.keys(), f"Data source {name} already exists"
+        assert name not in self._data_sources.keys(), f"[VIEW] Data source {name} already exists"
         self._data_sources[name] = data_source
         color = random.choice(Palette)
 
         def modify_doc():
-            print(f"Adding line for {name}")
+            print(f"[VIEW] Adding line from source: {name}")
             line = self._figure.line(
-                x="time", y="value",
+                x="datetime", y="value",
                 line_color=color, line_width=2,
                 source=data_source, legend_label=name
             )
@@ -38,9 +38,10 @@ class Root:
     def _get_figure():
         fig = figure(
             title="Data from Multiple Producers (Every Second)",
+            x_axis_type="datetime",
             sizing_mode="stretch_width",
             tools="pan,box_zoom,reset,save,wheel_zoom"
         )
         fig.xaxis.axis_label = "Date"
-        fig.yaxis.axis_label = "Random Value"
+        fig.yaxis.axis_label = "Value"
         return fig
