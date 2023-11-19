@@ -2,6 +2,7 @@ import socket
 from threading import Thread
 from model.boardManager import BoardManager
 from util.config import load_config
+from util.time import unix_time_byte
 
 
 class Sessions:
@@ -55,11 +56,12 @@ class Sessions:
 
     def _session_handler(self, _socket, address, board):
         self._log(f"[Session] starting with {address}")
+        _socket.send(unix_time_byte())
+        print("unix time sent", unix_time_byte())
         while True:
             try:
                 data = _socket.recv(300)
                 if data:
-                    self._log(f"[Session] received data from {address}")
                     board.push(data)
             except Exception as e:
                 self._log(f"[Session] exception {e}")

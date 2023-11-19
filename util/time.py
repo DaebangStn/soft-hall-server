@@ -12,3 +12,8 @@ def timestamp(prefix=None, postfix=None):
 
 def unix_time():
     return int(time.time())
+
+
+def unix_time_byte():
+    unix_time_64bit = str(int(time.time() * 1000000))
+    return unix_time_64bit.encode()
