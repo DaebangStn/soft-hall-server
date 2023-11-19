@@ -27,12 +27,4 @@ class Root:
         assert name not in self._data_sources.keys(), f"[VIEW] Data source {name} already exists"
         self._data_sources[name] = data_source
         color = random.choice(Palette)
-
-        def modify_doc():
-            print(f"[VIEW] Adding line from source: {name}")
-            line = self._figure.line(
-                x="datetime", y="value",
-                line_color=color, line_width=2,
-                source=data_source, legend_label=name
-            )
-        self._doc.add_next_tick_callback(modify_doc)
+        self._doc.add_next_tick_callback(lambda: self._plot.add_data(name, data_source, color))

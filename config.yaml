@@ -1,5 +1,6 @@
 sessions:
-  adaptor-mac: "90:0F:0C:35:C6:B2"
+  adaptor-mac: "00:1A:7D:DA:71:13"
+  workstation-mac: "90:0F:0C:35:C6:B2"
   max-sessions: 5
 
 board:
