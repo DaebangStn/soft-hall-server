@@ -20,7 +20,7 @@ def run_server():
     apps = {'/': modify_doc}
 
     # Create and configure the server
-    server = Server(apps, port=5006)
+    server = Server(apps, port=5006, address='0.0.0.0', allow_websocket_origin=["*"])
     server.start()
 
     # Start the I/O loop
