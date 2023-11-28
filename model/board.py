@@ -19,6 +19,9 @@ class Board:
         self._sources = {}
         self._filters = []
         self._add_sources('0')  # Must match the third character in the payload
+        self._add_sources('1')  # Must match the third character in the payload
+        self._add_sources('2')  # Must match the third character in the payload
+        self._add_sources('3')  # Must match the third character in the payload
         if logger is not None:
             self._logger = logger
         else:
@@ -74,11 +77,13 @@ class Board:
 
     def _deserialize(self, data_bin: ByteString) -> Optional[List[List[str]]]:
         try:
-            data_str = data_bin.rstrip(b'\x00').decode('utf-8').strip()
+            last_slash_index = data_bin.find(b'\x00')
+            data_bin = data_bin[:last_slash_index]
+            data_str = data_bin.decode('utf-8').strip()
             data_row = data_str.split('/')[:-1]
             data_serialized = [row.split(':') for row in data_row]
         except Exception as e:
-            self._log(f"{timestamp()}: Invalid data: {data_bin}")
+            self._log(f"Invalid data: {data_bin}")
             return None
         return data_serialized
 
@@ -86,12 +91,12 @@ class Board:
         data_valid = []
         for row in data_serialized:
             if len(row) != 2:
-                self._log(f"{timestamp()}: Invalid data: {row}")
+                self._log(f"Invalid data: {row}")
                 continue
             source_name = row[0]
             if source_name not in self._sources.keys():
                 if source_name != 't':
-                    self._log(f"{timestamp()}: Invalid source name: {source_name}")
+                    self._log(f"Invalid source name: {source_name}")
                     continue
             data_valid.append(row)
         return data_valid
@@ -112,7 +117,7 @@ class Board:
         return open(log_path, 'w')
 
     def _log(self, log):
-        self._logger(f"[{self._name}]: {log}")
+        self._logger(f"[{self._name}]{timestamp()}: {log}")
         self._log_file.write(f"{log}\n")
 
     def _log_line_clear(self):
@@ -130,7 +135,7 @@ class Board:
         dt = cvt_unix_time_ms_to_datetime(stamp)
         for i in indices:
             source_name = data_valid[i][0]
-            value = int(data_valid[i][1])
+            value = float(data_valid[i][1])
             if source_name not in total_data.keys():
                 total_data[source_name] = ([value], [dt])
             else:
