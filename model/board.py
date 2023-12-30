@@ -78,7 +78,8 @@ class Board:
     def _deserialize(self, data_bin: ByteString) -> Optional[List[List[str]]]:
         try:
             last_slash_index = data_bin.find(b'\x00')
-            data_bin = data_bin[:last_slash_index]
+            if last_slash_index != -1:
+                data_bin = data_bin[:last_slash_index]
             data_str = data_bin.decode('utf-8').strip()
             data_row = data_str.split('/')[:-1]
             data_serialized = [row.split(':') for row in data_row]

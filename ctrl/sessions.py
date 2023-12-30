@@ -43,6 +43,8 @@ class Sessions:
             client_socket = None
             try:
                 client_socket, _address = self._socket.accept()
+                if client_socket is None:
+                    return # Spawner is done
                 client_address = _address[0]
                 self._log(f"Accepted connection from {client_address}")
                 board = self._board_manager.get_board(client_address)
@@ -60,6 +62,14 @@ class Sessions:
         print("unix time sent", unix_time_us_ascii())
         while True:
             try:
+                """
+                    data format:                    
+                    key1:values1/key2:values2/...
+                    
+                    required keys:
+                        t: timestamp
+                        n: source name (check model.board.Board, self._add_sources)
+                """
                 data = _socket.recv(300)
                 if data:
                     board.push(data)
