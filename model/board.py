@@ -1,10 +1,12 @@
 from typing import Dict, List, ByteString, Optional, Tuple
 from queue import SimpleQueue
-from model.dataFilter import DataFilter
+
+from bokeh.models import ColumnDataSource
+
+from model.dataFilter import DataFilter, MeanFilter, MovingAverageFilter
 from util.config import load_config
 from util.path import get_log_file_path
 from util.time import timestamp, unix_time_ms, cvt_unix_time_ms_to_datetime
-from bokeh.models import ColumnDataSource
 
 
 class Board:
@@ -19,9 +21,11 @@ class Board:
         self._sources = {}
         self._filters = []
         self._add_sources('0')  # Must match the third character in the payload
-        self._add_sources('1')  # Must match the third character in the payload
-        self._add_sources('2')  # Must match the third character in the payload
-        self._add_sources('3')  # Must match the third character in the payload
+        # self._add_sources('1')  # Must match the third character in the payload
+        # self._add_sources('2')  # Must match the third character in the payload
+        # self._add_sources('3')  # Must match the third character in the payload
+        # self._add_filter(MeanFilter())
+        self._add_filter(MovingAverageFilter('0'))
         if logger is not None:
             self._logger = logger
         else:
@@ -39,7 +43,8 @@ class Board:
     def get_data_sources(self):
         return self._sources
 
-    def add_filter(self, _filter: DataFilter):
+    def _add_filter(self, _filter):
+        assert isinstance(_filter, DataFilter), "Filter must be a subclass of DataFilter"
         self._filters.append(_filter)
         self._add_sources(_filter.__name__)
 
@@ -97,11 +102,12 @@ class Board:
             if len(row) != 2:
                 self._log(f"Invalid data: {row}")
                 continue
-            source_name = row[0]
-            if source_name not in self._sources.keys():
-                if source_name != 't':
-                    self._log(f"Invalid source name: {source_name}")
-                    continue
+            # Even the sources are not registered, just pass
+            # source_name = row[0]
+            # if source_name not in self._sources.keys():
+            #     if source_name != 't':
+            #         self._log(f"Invalid source name: {source_name}")
+            #         continue
             data_valid.append(row)
         return data_valid
 
@@ -128,8 +134,9 @@ class Board:
         self._log_file.write("\n")
         self._logger("")
 
-    @staticmethod
-    def _append_raw_data(total_data: Dict[str, Tuple[List[int], List[int]]], data_valid: List[List[str]]):
+    def _append_raw_data(
+            self, total_data: Dict[str, Tuple[List[int], List[int]]], data_valid: List[List[str]]
+    ):
         if data_valid[0][0] == 't':
             indices = range(1, len(data_valid))
             stamp = int(data_valid[0][1])
@@ -141,7 +148,8 @@ class Board:
             source_name = data_valid[i][0]
             value = float(data_valid[i][1])
             if source_name not in total_data.keys():
-                total_data[source_name] = ([value], [dt])
+                if source_name in self._sources.keys():
+                    total_data[source_name] = ([value], [dt])
             else:
                 total_data[source_name][0].append(value)
                 total_data[source_name][1].append(dt)
