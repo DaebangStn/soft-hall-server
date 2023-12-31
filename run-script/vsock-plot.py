@@ -3,7 +3,7 @@ from ctrl.vsock_sessions import VSockSessions
 from view.root import Root
 from bokeh.server.server import Server
 
-num_threads = 4
+num_threads = 1
 
 
 def modify_doc(doc):

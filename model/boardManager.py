@@ -32,8 +32,9 @@ class BoardManager:
 
     def _add_board_to_root(self, board: Board):
         conf = {}
+        board_name = board.get_name()
         for source_name, source in board.get_data_sources().items():
             color = random.choice(Palette)
-            self._root.add_data_source(source, color)
+            self._root.add_data_source(board_name, source_name, source, color)
             conf[source_name] = color
-        self._root.add_legend(board.get_name(), conf)
+        self._root.add_legend(board_name, conf)

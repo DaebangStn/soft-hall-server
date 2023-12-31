@@ -16,8 +16,9 @@ class Root:
         self._plot = Plot(self._log)
         doc.add_root(self._plot.get())
 
-    def add_data_source(self, data_source: ColumnDataSource, color: str):
-        self._doc.add_next_tick_callback(lambda: self._plot.add_data(data_source, color))
+    def add_data_source(self, board_name, source_name, data_source: ColumnDataSource, color: str):
+        self._doc.add_next_tick_callback(
+            lambda: self._plot.add_data(board_name, source_name, data_source, color))
 
     def add_legend(self, title, conf):
         self._plot.add_legend(title, conf)
