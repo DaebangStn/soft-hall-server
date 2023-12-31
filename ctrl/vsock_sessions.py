@@ -6,9 +6,9 @@ from ctrl.sessions import Sessions
 
 
 class VSockSessions(Sessions):
-    def __init__(self, logger=None, num_threads=2):
+    def __init__(self, logger=None, num_threads=1):
         super().__init__(logger)
-        self._socket = VSocket(num_threads)
+        self._socket = VSocketHost(num_threads)
 
     def start(self):
         assert self._board_manager is not None, "Board manager must be set before starting sessions"
@@ -21,7 +21,7 @@ class VSockSessions(Sessions):
             self._log(f"[Error] while starting socket {e}")
 
 
-class VSocket:
+class VSocketHost:
     def __init__(self, num_threads):
         self._num_threads = num_threads
         self._idx = 0

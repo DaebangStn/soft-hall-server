@@ -3,12 +3,18 @@ from ctrl.vsock_sessions import VSockSessions
 from view.root import Root
 from bokeh.server.server import Server
 
+num_threads = 4
+
 
 def modify_doc(doc):
     root = Root(doc)
     board_manager = BoardManager()
     board_manager.set_root(root)
-    sessions = VSockSessions()
+    for i in range(num_threads):
+        board_manager.add_board(f"test-socket_{i}")
+    root.show()
+
+    sessions = VSockSessions(print, num_threads)
     sessions.set_board_manager(board_manager)
     sessions.start()
 

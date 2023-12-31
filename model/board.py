@@ -30,6 +30,9 @@ class Board:
     def push(self, data):
         self._q.put(data)
 
+    def get_name(self):
+        return self._name
+
     def get_item_num(self):
         return self._q.qsize()
 

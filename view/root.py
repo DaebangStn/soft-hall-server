@@ -1,8 +1,6 @@
-import random
 
 from bokeh.plotting import figure
-from bokeh.models import ColumnDataSource
-from bokeh.palettes import Category20_20 as Palette
+from bokeh.models import ColumnDataSource, Legend, Label
 
 from model.board import Board
 from view.plot import Plot
@@ -10,7 +8,6 @@ from view.plot import Plot
 
 class Root:
     def __init__(self, doc, logger=None):
-        self._data_sources = {}
         self._doc = doc
         if logger is not None:
             self._log = logger
@@ -19,12 +16,12 @@ class Root:
         self._plot = Plot(self._log)
         doc.add_root(self._plot.get())
 
-    def add_board(self, board: Board):
-        for source_name, source in board.get_data_sources().items():
-            self._add_data_source(source_name, source)
+    def add_data_source(self, data_source: ColumnDataSource, color: str):
+        self._doc.add_next_tick_callback(lambda: self._plot.add_data(data_source, color))
 
-    def _add_data_source(self, name: str, data_source: ColumnDataSource):
-        assert name not in self._data_sources.keys(), f"[VIEW] Data source {name} already exists"
-        self._data_sources[name] = data_source
-        color = random.choice(Palette)
-        self._doc.add_next_tick_callback(lambda: self._plot.add_data(name, data_source, color))
+    def add_legend(self, title, conf):
+        self._plot.add_legend(title, conf)
+
+    def show(self):
+        div = self._plot.pack_layout()
+        self._doc.add_root(div)
