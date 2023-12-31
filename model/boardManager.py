@@ -1,7 +1,5 @@
-import random
-
-from bokeh.palettes import Category20_20 as Palette
 from model.board import Board
+from util.style import get_color
 
 
 class BoardManager:
@@ -34,7 +32,7 @@ class BoardManager:
         conf = {}
         board_name = board.get_name()
         for source_name, source in board.get_data_sources().items():
-            color = random.choice(Palette)
+            color = get_color()
             self._root.add_data_source(board_name, source_name, source, color)
             conf[source_name] = color
         self._root.add_legend(board_name, conf)
